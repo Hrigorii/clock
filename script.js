@@ -83,6 +83,7 @@ window.onload = function () {
 		><span>type:${sity.type}</span>
 		 `;
 		showVar.append(div);
+		return div;
 	}
 
 	function createClockItem(sity, timestamp) {
@@ -104,20 +105,20 @@ window.onload = function () {
 	}
 
 	function clearShowVar() {
-		Array.from(showVar.children).forEach(item => item.remove());
 		showVar.removeEventListener('click', send);
+		Array.from(showVar.children).forEach(item => item.remove());
 	}
 
 	/////////////////////////////отображаем свое время //////////////////////////////////
 
 	currentTime(selfTime.querySelector('.wrapper-item__item'));
-	// async function getMyCity() {
-	// 	const response = await fetch('https://ipapi.co/json/');
-	// 	const data = await response.json();
-	// 	selfTime.querySelector('.wrapper-item__title').innerHTML = data.city
-	// }
+	async function getMyCity() {
+		const response = await fetch('https://ipapi.co/json/');
+		const data = await response.json();
+		selfTime.querySelector('.wrapper-item__title').innerHTML = data.city;
+	}
 
-	// getMyCity();
+	getMyCity();
 
 	/////////////////////////////вешаем слушатели событий для удаления болка с часами //////////////////////////////////
 
@@ -185,46 +186,44 @@ window.onload = function () {
 		if (url) {
 			fetch(url)
 				.then(response => response.json())
-
-				// от сервера получаем список найденных городов
-
 				.then(sitydata => {
-
-					// показываем список городов
-
-					showVar.classList.add('active');
-					sitydata.map((sity, index) => {
-						createVarItem(sity, index);
-					});
-
-					// вешаем слушатель на список
-
-					showVar.addEventListener('click', function send(event) {
-
-						// получаем нужный город
-
-						let currentSity = sitydata[event.target.closest('div').dataset.varId];
-						fetch(`https://api.ipgeolocation.io/timezone?apiKey=7b49894e5e6642c0820c0b69f287b426&lat=${currentSity.lat}&long=${currentSity.lon}`)
+					console.log(sitydata);
+					function autosend(lat, lon, sity) {
+						fetch(`https://api.ipgeolocation.io/timezone?apiKey=7b49894e5e6642c0820c0b69f287b426&lat=${lat}&long=${lon}`)
 							.then(response => response.json())
 							.then(tdata => {
-								const sityName = currentSity.display_name.match(/(\D*?),/)[1];
+								const sityName = sity.display_name.match(/(\D*?),/)[1];
 								const date = tdata.date_time.replace(/-|:|\s/g, ',').split(',').map(item => +item);
 
 								createClockItem(sityName, date);
 							})
-						clearShowVar()
+						clearShowVar();
 						inputForm.reset();
 						showVar.removeEventListener('click', send);
 						showVar.classList.remove('active');
 						// menuIcon.classList.remove('active-menu');
 						// menuBody.classList.remove('active-menu');
 						// document.body.classList.remove('lock');
-					},)
+					}
 
+					if (sitydata.length !== undefined) {
+						showVar.classList.add('active');
+
+						sitydata.map(sity => {
+							createVarItem(sity, sity.place_id).addEventListener('click', function send(event) {
+								let [currentSity] = sitydata.filter(sity => {
+									return sity.place_id === +event.target.closest('div').dataset.varId
+								})
+								autosend(currentSity.lat, currentSity.lon, currentSity);
+							},);
+						});
+
+					} else {
+						autosend(sitydata.lat, sitydata.lon, sitydata);
+					}
 				})
 		}
 	})
-
 }
 
 
