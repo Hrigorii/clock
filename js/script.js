@@ -5,23 +5,22 @@ window.onload = function () {
 
 		const clock = document.createElement('div');
 		clock.className = 'clock';
-		clock.style.backgroundImage = './strela 2.png';
 		const hour = document.createElement('img');
 		hour.className = 'clock__hour';
-		hour.src = './strela 2.png';
+		hour.src = './img/strela 2.png';
 		const min = document.createElement('img');
 		min.className = 'clock__min';
-		min.src = './strela 3.png';
+		min.src = './img/strela 3.png';
 		const sec = document.createElement('img');
-		sec.className = 'clock_sec';
-		sec.src = './strela 1.png';
+		sec.className = 'clock__sec';
+		sec.src = './img/strela 1.png';
 		clock.append(hour);
 		clock.append(min);
 		clock.append(sec);
 		target.append(clock);
 	}
 
-	function currentTime(target, timestamp) {
+	function createClock(target, timestamp) {
 
 		/////////////////////////////рисуем часы //////////////////////////////////
 
@@ -34,7 +33,7 @@ window.onload = function () {
 		let min = currentTime.getMinutes() * 6;
 		let hour = currentTime.getHours() * 30 + (currentTime.getMinutes() / 12) * 6
 
-		const secArrow = target.querySelector('.clock_sec');
+		const secArrow = target.querySelector('.clock__sec');
 		const minArrow = target.querySelector('.clock__min');
 		const hourArrow = target.querySelector('.clock__hour');
 
@@ -42,7 +41,7 @@ window.onload = function () {
 			secArrow.style.transform = `rotate(${sec}deg)`;
 			minArrow.style.transform = `rotate(${min}deg)`;
 			hourArrow.style.transform = `rotate(${hour}deg)`;
-			if (sec === 360) {
+			if (sec > 360) {
 				sec = 0;
 				min += 6;
 				switch (min) {
@@ -57,9 +56,9 @@ window.onload = function () {
 					case (360): hour += 6;
 						break;
 				}
-				if (min === 360) {
+				if (min > 360) {
 					min = 0;
-					if (hour === 360)
+					if (hour > 360)
 						hour = 0;
 				}
 			}
@@ -88,18 +87,18 @@ window.onload = function () {
 
 	function createClockItem(sity, timestamp) {
 		const div = document.createElement('div');
-		div.className = 'wrapper-item';
+		div.className = 'clock-item';
 		const close = document.createElement('div');
 		close.className = 'close';
-		close.innerHTML = '[X]';
+		close.innerHTML = 'X';
 		div.append(close);
 		const title = document.createElement('div');
-		title.className = 'wrapper-item__title';
+		title.className = 'clock-item__title';
 		title.innerHTML = sity;
 		div.append(title);
 		const item = document.createElement('div');
-		item.className = 'wrapper-item__item';
-		div.dataset.clockId = currentTime(item, timestamp);
+		item.className = 'clock-item__item';
+		div.dataset.clockId = createClock(item, timestamp);
 		div.append(item)
 		items.append(div);
 	}
@@ -111,11 +110,11 @@ window.onload = function () {
 
 	/////////////////////////////отображаем свое время //////////////////////////////////
 
-	currentTime(selfTime.querySelector('.wrapper-item__item'));
+	createClock(selfTime.querySelector('.clock-item__item'));
 	async function getMyCity() {
 		const response = await fetch('https://ipapi.co/json/');
 		const data = await response.json();
-		selfTime.querySelector('.wrapper-item__title').innerHTML = data.city;
+		selfTime.querySelector('.clock-item__title').innerHTML = data.city;
 	}
 
 	getMyCity();
@@ -124,8 +123,12 @@ window.onload = function () {
 
 	document.querySelector('.items').addEventListener('click', (event) => {
 		if (event.target.className === 'close active') {
-			clearInterval(event.target.closest('.wrapper-item').dataset.clockId);
-			event.target.closest('.wrapper-item').remove();
+			event.target.closest('.clock-item').classList.add('deleted')
+			setTimeout(() => {
+				clearInterval(event.target.closest('.clock-item').dataset.clockId);
+				event.target.closest('.clock-item').remove();
+				console.log('deleted');
+			}, 1000)
 		}
 		if (event.target.closest('div').className === 'clock') {
 			event.target.closest('div').parentElement.parentElement.firstElementChild.classList.toggle('active');
@@ -134,8 +137,8 @@ window.onload = function () {
 
 	///////////////////////////// анимируем меню //////////////////////////////////
 
-	const menuIcon = document.querySelector('.menu_icon');
-	const menuBody = document.querySelector('.menu_body');
+	const menuIcon = document.querySelector('.menu__icon');
+	const menuBody = document.querySelector('.menu__body');
 	if (menuIcon) {
 		menuIcon.addEventListener('click', (event) => {
 			document.body.classList.toggle('lock');
@@ -161,16 +164,8 @@ window.onload = function () {
 
 	send.addEventListener('click', (event) => {
 		event.preventDefault();
-
-		// очистка временного блока с городами
-
 		clearShowVar();
-
-		// удаление обработчика с болка с городами
-
 		showVar.removeEventListener('click', send);
-
-		// получение данных из формы
 
 		const inputForm = document.forms.inputForm;
 		const target = document.querySelectorAll('input[type="radio"]');
@@ -187,18 +182,22 @@ window.onload = function () {
 			fetch(url)
 				.then(response => response.json())
 				.then(sitydata => {
-					console.log(sitydata);
+
 					function autosend(lat, lon, sity) {
 						fetch(`https://api.ipgeolocation.io/timezone?apiKey=7b49894e5e6642c0820c0b69f287b426&lat=${lat}&long=${lon}`)
 							.then(response => response.json())
 							.then(tdata => {
+
 								const sityName = sity.display_name.match(/(\D*?),/)[1];
 								const date = tdata.date_time.replace(/-|:|\s/g, ',').split(',').map(item => +item);
 
 								createClockItem(sityName, date);
 							})
+
 						clearShowVar();
-						inputForm.reset();
+						inputForm.sity.value = '';
+						inputForm.lat.value = '';
+						inputForm.lon.value = '';
 						showVar.removeEventListener('click', send);
 						showVar.classList.remove('active');
 						// menuIcon.classList.remove('active-menu');
@@ -217,7 +216,6 @@ window.onload = function () {
 								autosend(currentSity.lat, currentSity.lon, currentSity);
 							},);
 						});
-
 					} else {
 						autosend(sitydata.lat, sitydata.lon, sitydata);
 					}

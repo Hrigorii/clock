@@ -1,0 +1,318 @@
+@charset "UTF-8";
+/*Обнуление*/
+* {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+:focus, :active {
+  outline: none;
+}
+
+a:focus, a:active {
+  outline: none;
+}
+
+nav, footer, header, aside {
+  display: block;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  font-size: 100%;
+  line-height: 1;
+  font-size: 14px;
+  -ms-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+input, button, textarea {
+  font-family: inherit;
+}
+
+input::-ms-clear {
+  display: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+button::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+
+a, a:visited {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+ul li {
+  list-style: none;
+}
+
+img {
+  vertical-align: top;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/*--------------------*/
+.lock {
+  overflow: hidden;
+}
+
+.wrapper {
+  width: 100%;
+  min-width: 350px;
+  min-height: 100%;
+  margin: 0px auto;
+  display: flex;
+  flex-direction: column;
+  background-image: url("../img/6028913-world-map-time-zones.jpg");
+  background-attachment: fixed;
+}
+
+.header {
+  width: 100%;
+  height: 50px;
+  margin: 0px 0px 30px 0px;
+  padding: 20px;
+  font-size: 24px;
+}
+
+.menu__icon {
+  width: 30px;
+  height: 18px;
+  position: relative;
+  cursor: pointer;
+  z-index: 11;
+}
+.menu__icon span, .menu__icon::before, .menu__icon::after {
+  left: 0;
+  height: 10%;
+  width: 100%;
+  position: absolute;
+  transition: all 0.3s ease 0s;
+  background-color: #fff;
+}
+.menu__icon::before, .menu__icon::after {
+  content: "";
+}
+.menu__icon::before {
+  top: 0;
+}
+.menu__icon::after {
+  bottom: 0;
+}
+.menu__icon span {
+  top: 50%;
+  transform: scale(1) translate(0%, -50%);
+}
+.menu__icon.active-menu span {
+  transform: scale(0) translate(0px, -50%);
+}
+.menu__icon.active-menu::before, .menu__icon.active-menu::after {
+  background-color: red;
+}
+.menu__icon.active-menu::before {
+  top: 50%;
+  transform: rotate(-45deg) translate(0px, -50%);
+}
+.menu__icon.active-menu::after {
+  bottom: 50%;
+  transform: rotate(45deg) translate(0px, 50%);
+}
+
+.menu__body {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  padding: 50px 20px 20px 20px;
+  background-color: rgba(0, 0, 0, 0.6);
+  transition: left 0.3s ease 0s;
+  z-index: 5;
+  box-sizing: border-box;
+  display: flex;
+  -moz-column-gap: 20px;
+       column-gap: 20px;
+  overflow: auto;
+}
+.menu__body.active-menu {
+  left: 0;
+}
+
+.inputform__iuputs {
+  margin: 20px 0px;
+}
+
+.inputform__input input[type=text] {
+  height: 30px;
+  padding: 0px 20px;
+  max-width: 200px;
+  margin: 0px 0px 20px 20px;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid white;
+  color: white;
+}
+.inputform__input input[type=text]:disabled {
+  background-color: rgba(0, 0, 0, 0.9);
+  color: black;
+  border-color: black;
+}
+.inputform__input input[type=radio] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #999;
+  transition: 0.2s all linear;
+  outline: none;
+  margin-right: 5px;
+  position: relative;
+  top: 4px;
+}
+.inputform__input input:checked {
+  border: 6px solid white;
+}
+.inputform__input label {
+  color: white;
+  margin: 0px 0px 10px 50px;
+  display: block;
+}
+
+.inputform__btn {
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.show-var {
+  color: white;
+  font-size: 16px;
+  display: none;
+}
+.show-var h2 {
+  font-size: 14px;
+  margin: 0px 0px 10px 0px;
+}
+.show-var span {
+  padding: 5px;
+}
+
+.show-var__item {
+  padding: 10px;
+  border: 1px solid white;
+  border-radius: 10px;
+  cursor: pointer;
+  margin: 0px 0px 10px 0px;
+}
+
+.main {
+  flex: 1 1 auto;
+}
+
+.main__self-time {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0px 0px 30px 0px;
+}
+
+.items {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, auto));
+  justify-content: center;
+  margin: 0px 0px 30px 0px;
+  padding: 10px 20px;
+}
+
+.clock-item {
+  display: flex;
+  max-width: 400px;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+.clock-item.deleted {
+  transition: all 0.5s ease 0s;
+  transform: scale(0);
+}
+
+.clock-item__title {
+  font-size: 14px;
+  font-weight: bold;
+  border: 1px solid gray;
+  border-radius: 10px;
+  padding: 10px 30px;
+  margin: 0px 0px 10px 0px;
+  display: inline-block;
+  box-shadow: 0px 0px 12px 8px;
+}
+
+.clock-item__item {
+  border: thick double black;
+  border-radius: 50%;
+  box-shadow: 0px 0px 17px 3px black;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  display: none;
+  transition: all 0.5s ease 0s;
+}
+.close:hover {
+  color: red;
+  cursor: pointer;
+  transform: scale(2) rotate(360deg);
+}
+
+.active {
+  display: block;
+}
+
+.clock {
+  width: 300px;
+  height: 300px;
+  background-image: url("../img/clock 1.png");
+  background-origin: padding-box;
+  box-sizing: border-box;
+  position: relative;
+}
+.clock .clock__hour {
+  position: absolute;
+}
+.clock .clock__min {
+  position: absolute;
+}
+.clock .clock_sec {
+  position: absolute;
+}
+
+.clock-item__item {
+  position: relative;
+  padding: 10px;
+}

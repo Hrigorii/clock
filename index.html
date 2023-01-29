@@ -5,37 +5,35 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="./style.css">
+	<link rel="stylesheet" href="./css/style.css">
 	<title>Clock</title>
 </head>
 
 <body>
 	<div class="wrapper">
 		<div class="header">
-			<div class="header__menu">
-				<div class="menu_icon">
+			<div class="menu">
+				<div class="menu__icon">
 					<span></span>
 				</div>
-				<div class="menu_body">
-					<form action="#" name="inputForm" class="header__menu_inputform">
-						<div class="iuputs">
-							<div class="input">
-								<label for="inputPlace">Input Sity Name</label>
+				<div class="menu__body">
+					<form action="#" name="inputForm" class="inputform">
+						<div class="inputform__iuputs">
+							<div class="inputform__input">
+								<label for="cityName">Input Sity Name</label>
 								<input id="cityName" type="radio" name="inputPlace" value="cityName" checked>
 								<input name="sity" type="text" placeholder="Sity Name">
 							</div>
-							<div class="input">
-								<label for="">Input Geocoords lat, lon</label>
+							<div class="inputform__input">
+								<label for="coords">Input Geocoords lat, lon</label>
 								<input id="coords" type="radio" name="inputPlace" value="coords">
 								<input type="text" name="lat" placeholder="lat" disabled>
 								<input type="text" name="lon" placeholder="lon" disabled>
 							</div>
 						</div>
-						<button id="send" class="input_btn"> Add New Clock</button>
+						<button id="send" class="inputform__btn"> Add New Clock</button>
 					</form>
 					<div id="showVar" class="show-var">
-						<div></div>
-						<span></span>
 					</div>
 				</div>
 			</div>
@@ -43,13 +41,14 @@
 
 		<div class="main">
 			<div id="selfTime" class="main__self-time">
-				<div class="wrapper-item">
-					<div class="wrapper-item__title"></div>
-					<div class="wrapper-item__item"> </div>
+				<div class="clock-item">
+					<div class="clock-item__title"></div>
+					<div class="clock-item__item"> </div>
 				</div>
 			</div>
 			<div id="items" class="items"></div>
 		</div>
+		<div class="footer"></div>
 	</div>
 
 
@@ -59,7 +58,7 @@
 
 
 
-	<script src="./script.js">	</script>
+	<script src="./js/script.js">	</script>
 </body>
 
 </html>
