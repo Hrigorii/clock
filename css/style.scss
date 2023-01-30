@@ -19,6 +19,16 @@ $clockFace: '../img/clock\ 1.png';
 	background-attachment: fixed;
 }
 
+.error{
+	color: red;
+	margin: 10px;
+	visibility: hidden;
+	transition: all 0.3s ease 0s;
+	&.active{
+		visibility: visible;
+	}
+}
+
 //////////////////////////////////////// header content ////////////////////////////// */
 
 .header {

@@ -104,17 +104,45 @@ window.onload = function () {
 	}
 
 	function clearShowVar() {
-		showVar.removeEventListener('click', send);
 		Array.from(showVar.children).forEach(item => item.remove());
 	}
+
+	function clearAll() {
+		clearShowVar();
+		inputForm.sity.value = '';
+		inputForm.lat.value = '';
+		inputForm.lon.value = '';
+		showVar.classList.remove('active');
+	}
+
+	function errorShow(error) {
+		console.error(error);
+		showError.innerHTML = `Ooops... something wrong try again`;
+		showError.classList.add('active');
+	}
+
+	function clearError() {
+		showError.innerHTML = '';
+		showError.classList.remove('active');
+	}
+
 
 	/////////////////////////////отображаем свое время //////////////////////////////////
 
 	createClock(selfTime.querySelector('.clock-item__item'));
+
 	async function getMyCity() {
-		const response = await fetch('https://ipapi.co/json/');
-		const data = await response.json();
-		selfTime.querySelector('.clock-item__title').innerHTML = data.city;
+		try {
+			const response = await fetch('https://ipapi.co/json/');
+			const data = await response.json();
+			if (!data.city || data.city === '') {
+				throw new Error('response has no sity name')
+			}
+			selfTime.querySelector('.clock-item__title').innerHTML = data.city;
+		} catch (error) {
+			console.error(error.message);
+			selfTime.querySelector('.clock-item__title').innerHTML = 'Your Time';
+		}
 	}
 
 	getMyCity();
@@ -144,6 +172,8 @@ window.onload = function () {
 			document.body.classList.toggle('lock');
 			menuIcon.classList.toggle('active-menu');
 			menuBody.classList.toggle('active-menu');
+			clearAll();
+			clearError();
 		})
 	}
 
@@ -165,7 +195,7 @@ window.onload = function () {
 	send.addEventListener('click', (event) => {
 		event.preventDefault();
 		clearShowVar();
-		showVar.removeEventListener('click', send);
+		clearError();
 
 		const inputForm = document.forms.inputForm;
 		const target = document.querySelectorAll('input[type="radio"]');
@@ -193,13 +223,11 @@ window.onload = function () {
 
 								createClockItem(sityName, date);
 							})
+							.catch(error => errorShow(error));
 
-						clearShowVar();
-						inputForm.sity.value = '';
-						inputForm.lat.value = '';
-						inputForm.lon.value = '';
-						showVar.removeEventListener('click', send);
-						showVar.classList.remove('active');
+
+						clearAll();
+
 						// menuIcon.classList.remove('active-menu');
 						// menuBody.classList.remove('active-menu');
 						// document.body.classList.remove('lock');
@@ -209,7 +237,7 @@ window.onload = function () {
 						showVar.classList.add('active');
 
 						sitydata.map(sity => {
-							createVarItem(sity, sity.place_id).addEventListener('click', function send(event) {
+							createVarItem(sity, sity.place_id).addEventListener('click', function sendData(event) {
 								let [currentSity] = sitydata.filter(sity => {
 									return sity.place_id === +event.target.closest('div').dataset.varId
 								})
@@ -220,6 +248,7 @@ window.onload = function () {
 						autosend(sitydata.lat, sitydata.lon, sitydata);
 					}
 				})
+				.catch(error => errorShow(error));
 		}
 	})
 }
