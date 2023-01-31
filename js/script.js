@@ -22,11 +22,7 @@ window.onload = function () {
 
 	function createClock(target, timestamp) {
 
-		/////////////////////////////рисуем часы //////////////////////////////////
-
 		showClock(target);
-
-		/////////////////////////////устанавливаем начальное время //////////////////////////////////
 
 		const currentTime = timestamp ? new Date(timestamp[0], timestamp[1] - 1, timestamp[2], timestamp[3], timestamp[4], timestamp[5]) : new Date();
 		let sec = currentTime.getSeconds();
@@ -63,10 +59,7 @@ window.onload = function () {
 				}
 			}
 			sec += 6;
-
 		}
-
-		///////////////////////////// запускаем время //////////////////////////////////
 
 		return setInterval(step, 1000);
 	}
@@ -94,11 +87,12 @@ window.onload = function () {
 		div.append(close);
 		const title = document.createElement('div');
 		title.className = 'clock-item__title';
-		title.innerHTML = sity;
+		title.innerHTML = sity.name;
 		div.append(title);
 		const item = document.createElement('div');
 		item.className = 'clock-item__item';
 		div.dataset.clockId = createClock(item, timestamp);
+		div.dataset.blockId = sity.id;
 		div.append(item)
 		items.append(div);
 	}
@@ -126,17 +120,39 @@ window.onload = function () {
 		showError.classList.remove('active');
 	}
 
+	function autosend(lat, lon, sity) {
+		fetch(`https://api.ipgeolocation.io/timezone?apiKey=7b49894e5e6642c0820c0b69f287b426&lat=${lat}&long=${lon}`)
 
-	/////////////////////////////отображаем свое время //////////////////////////////////
+			.then(response => {
+				if (response.ok) {
+					localStorage.setItem(sity.place_id, JSON.stringify({ ...sity }));
+				}
+				return response.json();
+			})
+			.then(tdata => {
+				const sityName = {
+					name: sity.display_name.match(/(\D*?),/)[1],
+					id: sity.place_id,
+				};
+				const date = tdata.date_time.replace(/-|:|\s/g, ',').split(',').map(item => +item);
 
-	createClock(selfTime.querySelector('.clock-item__item'));
+				createClockItem(sityName, date);
+			})
+			.catch(error => errorShow(error));
+
+		clearAll();
+
+		// menuIcon.classList.remove('active-menu');
+		// menuBody.classList.remove('active-menu');
+		// document.body.classList.remove('lock');
+	}
 
 	async function getMyCity() {
 		try {
 			const response = await fetch('https://ipapi.co/json/');
 			const data = await response.json();
 			if (!data.city || data.city === '') {
-				throw new Error('response has no sity name')
+				throw new Error('response has no sity name');
 			}
 			selfTime.querySelector('.clock-item__title').innerHTML = data.city;
 		} catch (error) {
@@ -145,19 +161,48 @@ window.onload = function () {
 		}
 	}
 
+	/////////////////////////////отображаем свое время //////////////////////////////////
+
+	createClock(selfTime.querySelector('.clock-item__item'));
+
 	getMyCity();
+
+	/////////////////////////////отображаем сохраненные в localestorage часы //////////////////////////////////
+
+	if (localStorage.length > 0) {
+		let allKeys = Object.keys(localStorage);
+
+		allKeys.map(id => {
+			const localeData = JSON.parse(localStorage[id]);
+
+			if (+id === localeData.place_id) {
+				// API банит запросы интервалом менее 2 с
+				setTimeout(() => {
+					try {
+						autosend(localeData.lat, localeData.lon, localeData);
+					} catch (error) {
+						console.error(error);
+					}
+				}, 2000);
+			}
+		})
+	}
 
 	/////////////////////////////вешаем слушатели событий для удаления болка с часами //////////////////////////////////
 
 	document.querySelector('.items').addEventListener('click', (event) => {
+
 		if (event.target.className === 'close active') {
-			event.target.closest('.clock-item').classList.add('deleted')
+			const selectedClock = event.target.closest('.clock-item');
+			selectedClock.classList.add('deleted');
 			setTimeout(() => {
-				clearInterval(event.target.closest('.clock-item').dataset.clockId);
-				event.target.closest('.clock-item').remove();
+				localStorage.removeItem(selectedClock.dataset.blockId);
+				clearInterval(selectedClock.dataset.clockId);
+				selectedClock.remove();
 				console.log('deleted');
 			}, 1000)
 		}
+
 		if (event.target.closest('div').className === 'clock') {
 			event.target.closest('div').parentElement.parentElement.firstElementChild.classList.toggle('active');
 		}
@@ -167,6 +212,7 @@ window.onload = function () {
 
 	const menuIcon = document.querySelector('.menu__icon');
 	const menuBody = document.querySelector('.menu__body');
+
 	if (menuIcon) {
 		menuIcon.addEventListener('click', (event) => {
 			document.body.classList.toggle('lock');
@@ -213,29 +259,8 @@ window.onload = function () {
 				.then(response => response.json())
 				.then(sitydata => {
 
-					function autosend(lat, lon, sity) {
-						fetch(`https://api.ipgeolocation.io/timezone?apiKey=7b49894e5e6642c0820c0b69f287b426&lat=${lat}&long=${lon}`)
-							.then(response => response.json())
-							.then(tdata => {
-
-								const sityName = sity.display_name.match(/(\D*?),/)[1];
-								const date = tdata.date_time.replace(/-|:|\s/g, ',').split(',').map(item => +item);
-
-								createClockItem(sityName, date);
-							})
-							.catch(error => errorShow(error));
-
-
-						clearAll();
-
-						// menuIcon.classList.remove('active-menu');
-						// menuBody.classList.remove('active-menu');
-						// document.body.classList.remove('lock');
-					}
-
 					if (sitydata.length !== undefined) {
 						showVar.classList.add('active');
-
 						sitydata.map(sity => {
 							createVarItem(sity, sity.place_id).addEventListener('click', function sendData(event) {
 								let [currentSity] = sitydata.filter(sity => {
